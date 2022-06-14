@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>org.examle</groupId>
+    <artifactId>elasticsearch</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>elasticsearch</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <skipTests>true</skipTests>
+    </properties>
+
+    <dependencies>
+        <!--web-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--log4j2-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+
+        <!--elasticsearch-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+            <exclusions>
+                <!--按官网的说明，针对 elasticsearch 7.17 版本添加 jackson-databind 依赖会导致启动报错: java.lang.NoClassDefFoundError: jakarta/json/JsonException-->
+                <!--但是搜索 JsonException 能搜到 1.1.6 版本, -->
+                <!--而按 spring-boot-starter-data-elasticsearch ==> spring-data-elasticsearch ==>elasticsearch-java ==> jakarta.json-api, 查到的依赖版本却是 2.0.1-->
+                <!--按这个帖子 https://blog.csdn.net/LiuLei_2015/article/details/122982570 做法有效, 好像是需要依赖高版 json-api-->
+                <exclusion>
+                    <groupId>jakarta.json</groupId>
+                    <artifactId>jakarta.json-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--json-api-->
+        <!--按官网的说明，针对 elasticsearch 7.17 版本添加 jackson-databind 依赖会导致启动报错: java.lang.NoClassDefFoundError: jakarta/json/JsonException-->
+        <!--但是搜索 JsonException 能搜到 1.1.6 版本, -->
+        <!--而按 spring-boot-starter-data-elasticsearch ==> spring-data-elasticsearch ==>elasticsearch-java ==> jakarta.json-api, 查到的依赖版本却是 2.0.1-->
+        <!--按这个帖子 https://blog.csdn.net/LiuLei_2015/article/details/122982570 做法有效, 好像是需要依赖高版 json-api-->
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
+        <!--fastjson-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>2.0.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <!--lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!--test-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.1.8.RELEASE</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

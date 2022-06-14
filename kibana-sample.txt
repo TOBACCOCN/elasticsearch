@@ -1,0 +1,275 @@
+GET _search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+# 分词
+GET /book/_analyze
+{
+  "field": "author",
+  "text": "Thomas H.Cormen / Charles E.Leiserson / Ronald L.Rivest / Clifford Stein"
+}
+
+# 添加索引
+PUT /book?pretty=true
+
+# 添加字段
+PUT /book/_mapping
+{
+  "properties":{
+    "test_field": {
+      "type": "text"
+    }
+  }
+}
+
+GET /
+
+# 查询 booK 索引
+GET /book
+
+# 删除 booK 索引
+DELETE /book
+
+# 查询 book 索引的所有 document
+GET /book/_search
+
+GET /book/_search
+{
+  "query": {
+    "term": {
+      "title": {
+        "value": "算法导论"
+      }
+    }
+  }
+}
+
+GET /book/_search
+{
+  "query": {
+    "term": {
+      "title": {
+        "value": "算法导论"
+      }
+    }
+  }
+}
+
+# 按条件精确查询 book 索引的 document
+GET /book/_search
+{
+  "query": {
+    "match": {
+      "name": "Java"
+    }
+  }
+}
+
+# 按条件分词查询 book 索引的 document
+GET /book/_search
+{
+  "query": {
+    "term": {
+      "name.keyword": {
+        "value": "Java"
+      }
+    }
+  }
+}
+
+GET /book/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "title": "算法"
+          }
+        },
+        {
+          "term": {
+            "author": "Thomas H.Cormen / Charles E.Leiserson / Ronald L.Rivest / Clifford Stein"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# 添加或修改 book 索引的 document, _doc/ 后跟的是 ID, ID 重复的话就修改, 没有重复就添加
+# 修改时, _doc 表示的是全量修改, 对 document 先删除在添加, 所以原有字段都有可能消失
+PUT /book/_doc/1000
+{
+  "id": 12346,
+  "title": "深入理解 Java 虚拟机",
+  "author": "周志明",
+  "price": 69.00
+}
+
+# 添加 book 索引的 document, _doc/ 后没跟 ID, ES 会自动创建 ID
+POST /book/_doc
+{
+  "id": 12345,
+  "title": "算法导论",
+  "author": "Thomas H.Cormen / Charles E.Leiserson / Ronald L.Rivest / Clifford Stein",
+  "price": 128.00
+}
+
+# 添加或修改 book 索引的 document, _doc/ 后跟的是 ID, ID 重复的话就修改, 没有重复就添加
+# 修改时, _doc 表示的是全量修改, 对 document 先删除在添加, 所以原有字段都有可能消失
+POST /book/_doc/1001
+{
+  "id": 12347,
+  "title": "Java 编程思想",
+  "author": "Bruce Eckel",
+  "price": 108.00
+}
+POST /book/_doc/1001
+{
+  "id": 12347,
+  "title": "JAVA 编程思想",
+  "price": 108.00
+}
+
+# 局部修改 book 索引的 document, _update 只修改 document 指定字段, document 其他字段保留
+POST /book/_update/f1IbWYEBXZ-KJmvuvJY8
+{
+  "script": "ctx._source.author='Thomas H.Cormen/Charles E.Leiserson/Ronald L.Rivest/Clifford Stein'"
+}
+
+
+PUT /books
+{
+  "mappings" : {
+    "properties" : {
+      "_class" : {
+        "type" : "keyword",
+        "index" : false,
+        "doc_values" : false
+      },
+      "author" : {
+        "type" : "text",
+        "analyzer" : "ik_max_word"
+      },
+      "createTime" : {
+        "type" : "date",
+        "format" : "date_optional_time"
+      },
+      "id" : {
+        "type" : "keyword"
+      },
+      "price" : {
+        "type" : "double"
+      },
+      "test_field" : {
+        "type" : "keyword"
+      },
+      "title" : {
+        "type" : "text",
+        "analyzer" : "ik_max_word"
+      },
+      "updateTime" : {
+        "type" : "date",
+        "format" : "date_optional_time"
+      }
+    }
+  }
+}
+
+POST /books/_doc
+{
+  "author": "邹志明",
+  "title": "深入理解 Java 虚拟机",
+  "test_field": "hello world"
+}
+
+POST /books/_doc
+{
+  "author": "张志明",
+  "title": "深入理解 Java 虚拟机",
+  "test_field": "world hello"
+}
+
+GET /books/_search
+{
+  "sort": [
+    {
+      "test_field": {
+        "order": "asc"
+      }
+    }
+  ]
+}
+
+DELETE /books
+
+GET /books
+
+PUT /books2
+{
+  "mappings" : {
+    "properties" : {
+      "_class" : {
+        "type" : "keyword",
+        "index" : false,
+        "doc_values" : false
+      },
+      "author" : {
+        "type" : "text",
+        "analyzer" : "ik_max_word"
+      },
+      "createTime" : {
+        "type" : "date",
+        "format" : "date_optional_time"
+      },
+      "id" : {
+        "type" : "keyword"
+      },
+      "price" : {
+        "type" : "double"
+      },
+      "title" : {
+        "type" : "text",
+        "analyzer" : "ik_max_word"
+      },
+      "updateTime" : {
+        "type" : "date",
+        "format" : "date_optional_time"
+      }
+    }
+  }
+}
+
+GET /books2
+
+POST /_reindex
+{
+  "source": {
+    "index": "books"
+  },
+  "dest": {
+    "index": "books3"
+  }
+}
+
+GET /books3
+
+DELETE /books
+
+POST /_aliases
+{
+  "actions": [
+    {
+      "add": {
+        "index": "books2",
+        "alias": "books"
+      }
+    }
+  ]
+}
+
+GET /booksss
