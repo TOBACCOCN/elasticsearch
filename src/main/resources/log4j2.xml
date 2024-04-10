@@ -4,64 +4,55 @@
         <Property name="APP" value="elasticsearch"/>
         <Property name="LOG_DIR" value="./logs"/>
         <Property name="SPLIT_SIZE" value="100MB"/>
-        <Property name="LOG_PATTERN" value="%d{HH:mm:ss.SSS} [%t] %level %logger{36}:%L @_@ %msg%n"/>
+        <!--https://logging.apache.org/log4j/2.x/manual/layouts.html#PatternLayout-->
+        <Property name="LOG_PATTERN" value="%d %level %pid [%t] %logger : %msg%n%throwable"/>
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
 
-        <RollingFile name="InfoLog" fileName="${LOG_DIR}/${APP}-info.log"
-                     filePattern="${LOG_DIR}/${APP}-info-%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingFile name="WarnLog" fileName="${LOG_DIR}/${APP}-warn.log"
+                     filePattern="${LOG_DIR}/${APP}-warn-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
-                <!--interval属性用来指定多久滚动一次，默认是1， 单位到底是月 天 小时 分钟，根据filePattern配置的日期格式而定，本处的格式为天，则默认为1天-->
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-                <!--按大小分-->
-                <SizeBasedTriggeringPolicy size="${SPLIT_SIZE}"/>
-            </Policies>
-
-            <Filters>
-                <!-- 只记录error级别信息 -->
-                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </RollingFile>
-
-        <RollingFile name="ErrorLog" fileName="${LOG_DIR}/${APP}-error.log"
-                     filePattern="${LOG_DIR}/${APP}-error-%d{yyyy-MM-dd}-%i.log.gz">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
-            <Policies>
-                <!--interval属性用来指定多久滚动一次，默认是1， 单位到底是月 天 小时 分钟，根据filePattern配置的日期格式而定，本处的格式为天，则默认为1天-->
+                <!--interval 属性用来指定多久滚动一次，默认是 1， 单位到底是月 天 小时 分钟，根据 filePattern 配置的日期格式而定，本处的格式为天，则默认为 1天-->
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
                 <!--按大小分-->
                 <SizeBasedTriggeringPolicy size="${SPLIT_SIZE}"/>
             </Policies>
             <Filters>
-                <!-- 只记录error级别信息 -->
-                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+                <!--记录指定级别及以上日志-->
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+                <!-- 只记录指定级别日志-->
+                <!--<LevelMatchFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>-->
             </Filters>
         </RollingFile>
+
         <RollingFile name="DebugLog" fileName="${LOG_DIR}/${APP}-debug.log"
                      filePattern="${LOG_DIR}/${APP}-debug-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
-                <!--interval 属性用来指定多久滚动一次，默认是1， 单位到底是月 天 小时 分钟，根据filePattern配置的日期格式而定，本处的格式为天，则默认为1天-->
+                <!--interval 属性用来指定多久滚动一次，默认是 1， 单位到底是月 天 小时 分钟，根据 filePattern 配置的日期格式而定，本处的格式为天，则默认为 1 天-->
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
                 <!--按大小分-->
                 <SizeBasedTriggeringPolicy size="${SPLIT_SIZE}"/>
             </Policies>
             <Filters>
-                <!-- 只记录 debug 级别信息 -->
+                <!--记录指定级别及以上日志-->
                 <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+                <!--只记录指定级别日志 -->
+                <!--<LevelMatchFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>-->
             </Filters>
         </RollingFile>
     </Appenders>
+
     <Loggers>
         <Logger name="org.example" level="debug"/>
+        <!-- 级别从高到低为: OFF>FATAL>ERROR>WARN>INFO>DEBUG>TRACE>ALL(参看 org.apache.logging.log4j.spi.StandardLevel)-->
         <Root level="info">
             <AppenderRef ref="Console"/>
-            <!--            <AppenderRef ref="ErrorLog"/>-->
-            <!--            <AppenderRef ref="InfoLog"/>-->
+            <AppenderRef ref="WarnLog"/>
             <AppenderRef ref="DebugLog"/>
         </Root>
     </Loggers>
